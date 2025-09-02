@@ -1,12 +1,24 @@
 import { useState } from 'react'
 import './App.css'
 
+// Types
+interface ExchangeRateResponse {
+  from: string;
+  to: string;
+  rate: number;
+  source: string;
+  timestamp: string;
+}
+
+type Currency = 'TON' | 'USDT' | 'more';
+type TimeSelection = 'now' | 'specific';
+
 function App() {
-  const [fromCurrency, setFromCurrency] = useState('TON')
-  const [toCurrency, setToCurrency] = useState('USDT')
-  const [exchangeSource, setExchangeSource] = useState('CoinGecko')
-  const [timeSelection, setTimeSelection] = useState('now')
-  const [exchangeRate, setExchangeRate] = useState(null)
+  const [fromCurrency, setFromCurrency] = useState<Currency>('TON')
+  const [toCurrency, setToCurrency] = useState<Currency>('USDT')
+  const [exchangeSource, setExchangeSource] = useState<string>('CoinGecko')
+  const [timeSelection, setTimeSelection] = useState<TimeSelection>('now')
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null)
 
   const handleCurrencySwitch = () => {
     const temp = fromCurrency
@@ -14,15 +26,18 @@ function App() {
     setToCurrency(temp)
   }
 
-  const handleGo = () => {
-    const tonToUsdtRate = 123.45
-    const usdtToTonRate = 1 / tonToUsdtRate
-    
-    if (fromCurrency === 'TON' && toCurrency === 'USDT') {
-      setExchangeRate(tonToUsdtRate)
-    } else if (fromCurrency === 'USDT' && toCurrency === 'TON') {
-      setExchangeRate(usdtToTonRate)
-    } else {
+  const handleGo = async (): Promise<void> => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}`)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data: ExchangeRateResponse = await response.json()
+      setExchangeRate(data.rate)
+    } catch (error) {
+      console.error('Error fetching exchange rate:', error)
       setExchangeRate(null)
     }
   }
@@ -35,9 +50,10 @@ function App() {
           <select 
             value={fromCurrency} 
             onChange={(e) => {
-              setFromCurrency(e.target.value)
-              if (e.target.value === 'TON') setToCurrency('USDT')
-              if (e.target.value === 'USDT') setToCurrency('TON')
+              const value = e.target.value as Currency
+              setFromCurrency(value)
+              if (value === 'TON') setToCurrency('USDT')
+              if (value === 'USDT') setToCurrency('TON')
             }}
             className="currency-select"
           >
@@ -53,9 +69,10 @@ function App() {
           <select 
             value={toCurrency} 
             onChange={(e) => {
-              setToCurrency(e.target.value)
-              if (e.target.value === 'TON') setFromCurrency('USDT')
-              if (e.target.value === 'USDT') setFromCurrency('TON')
+              const value = e.target.value as Currency
+              setToCurrency(value)
+              if (value === 'TON') setFromCurrency('USDT')
+              if (value === 'USDT') setFromCurrency('TON')
             }}
             className="currency-select"
           >
@@ -86,7 +103,7 @@ function App() {
                 name="time" 
                 value="now" 
                 checked={timeSelection === 'now'}
-                onChange={(e) => setTimeSelection(e.target.value)}
+                onChange={(e) => setTimeSelection(e.target.value as TimeSelection)}
               />
               Now
             </label>
@@ -96,7 +113,7 @@ function App() {
                 name="time" 
                 value="specific" 
                 checked={timeSelection === 'specific'}
-                onChange={(e) => setTimeSelection(e.target.value)}
+                onChange={(e) => setTimeSelection(e.target.value as TimeSelection)}
               />
               Specific Date & Time
             </label>
