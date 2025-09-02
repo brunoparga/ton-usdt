@@ -28,7 +28,8 @@ function App() {
 
   const handleGo = async (): Promise<void> => {
     try {
-      const response = await fetch(`http://localhost:3001/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}`)
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
+      const response = await fetch(`${backendUrl}/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

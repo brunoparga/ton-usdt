@@ -19,8 +19,27 @@ This application provides a lightweight solution for monitoring TON/USDT cryptoc
 
 - Node.js 22.x (LTS) or higher
 - npm 10.x or higher
+- Docker and Docker Compose (for containerized deployment)
 
-### Backend Setup
+### Option 1: Docker Deployment (Recommended)
+
+1. Build and start all services:
+   ```bash
+   docker-compose up --build
+   ```
+
+2. Access the application:
+   - Frontend: `http://localhost`
+   - Backend API: `http://localhost:3001`
+
+3. Stop the services:
+   ```bash
+   docker-compose down
+   ```
+
+### Option 2: Local Development
+
+#### Backend Setup
 
 1. Navigate to the backend directory:
    ```bash
@@ -35,11 +54,13 @@ This application provides a lightweight solution for monitoring TON/USDT cryptoc
 3. Start the server:
    ```bash
    npm start
+   # or for development with auto-reload:
+   npm run dev
    ```
 
 4. Backend runs on `http://localhost:3001`
 
-### Frontend Setup
+#### Frontend Setup
 
 1. Navigate to the frontend directory:
    ```bash
@@ -58,24 +79,59 @@ This application provides a lightweight solution for monitoring TON/USDT cryptoc
 
 4. Open your browser and visit `http://localhost:5173`
 
+## Testing
+
+### Frontend Tests
+
+Run frontend tests using Vitest:
+
+```bash
+cd frontend
+npm test                   # Run tests once
+npm run test:watch         # Run tests in watch mode
+npm run test:coverage      # Run tests with coverage report
+npm run test:ui            # Run tests with UI interface
+```
+
+### Backend Tests
+
+Run backend tests using Jest:
+
+```bash
+cd backend
+npm test                  # Run tests once
+npm run test:watch        # Run tests in watch mode
+npm run test:coverage     # Run tests with coverage report
+```
+
 ## Project Structure
 
 ```
 ton-usdt/
 ├── backend/
 │   ├── src/
-│   │   └── index.ts         # Express server
+│   │   ├── index.ts         # Express server entry point
+│   │   ├── app.ts           # Express app configuration
+│   │   └── __tests__/       # Backend test files
+│   ├── Dockerfile           # Backend Docker configuration
 │   ├── package.json         # Backend dependencies
+│   ├── jest.config.js       # Jest test configuration
 │   └── tsconfig.json        # TypeScript configuration
 ├── frontend/
 │   ├── src/
 │   │   ├── App.tsx          # Main application component
+│   │   ├── App.test.tsx     # Frontend test file
 │   │   ├── App.css          # Application styles
-│   │   └── main.tsx         # Application entry point
+│   │   ├── main.tsx         # Application entry point
+│   │   └── test/            # Test setup files
 │   ├── public/              # Static assets
+│   ├── Dockerfile           # Frontend Docker configuration
+│   ├── nginx.conf           # Nginx configuration
 │   ├── package.json         # Frontend dependencies
 │   ├── vite.config.ts       # Vite configuration
+│   ├── vitest.config.ts     # Vitest test configuration
 │   └── tsconfig.json        # TypeScript configuration
+├── docker-compose.yml       # Docker Compose configuration
 ├── .gitignore              # Git ignore rules
 └── README.md               # This file
 ```
@@ -141,12 +197,15 @@ Check server health status.
 - Backend: Express API with exchange rate endpoints
 - Integration: Frontend fetches data from backend API
 - TypeScript: Both frontend and backend converted to TypeScript
+- **Testing**: Comprehensive unit tests for both frontend and backend
+- **Docker**: Full containerization with Docker Compose
+- **Production Ready**: Optimized Docker images with health checks
 
 🔄 **Next Steps**:
 - Real CoinGecko API integration
 - In-memory caching
-- Local Docker deployment
 - SQLite database for historical data
+- CI/CD pipeline setup
 
 ## License
 
