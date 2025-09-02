@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { createRateLimiter, createRequestLogger } from './middleware';
+import { createRateLimiter, createRequestLogger, createErrorHandler } from './middleware';
 import { createRoutes } from './routes';
 
 export function createApp() {
@@ -14,6 +14,9 @@ export function createApp() {
 
   // Routes
   app.use(createRoutes());
+
+  // Error handling (must be last)
+  app.use(createErrorHandler());
 
   return app;
 }

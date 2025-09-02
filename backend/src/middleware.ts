@@ -1,11 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import logger from './logger';
+import { config } from './config';
+import { createErrorHandler } from './middleware/errorHandler';
 
 export function createRateLimiter() {
   return rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.max,
     message: {
       error: 'Too many requests from this IP, please try again later.'
     },
@@ -24,3 +26,5 @@ export function createRequestLogger() {
     next();
   };
 }
+
+export { createErrorHandler };
