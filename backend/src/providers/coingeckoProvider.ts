@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { BaseProvider, ExchangeRateData, ProviderConfig } from './baseProvider';
+import { getCoinGeckoMapping, isSupportedCurrency } from '../config/currency';
 
 interface CoinGeckoResponse {
   [coinId: string]: {
@@ -8,15 +9,6 @@ interface CoinGeckoResponse {
 }
 
 export class CoinGeckoProvider extends BaseProvider {
-  private readonly coinMapping: Record<string, string> = {
-    'TON': 'the-open-network',
-    'USDT': 'tether'
-  };
-
-  private readonly currencyMapping: Record<string, string> = {
-    'USD': 'usd',
-    'USDT': 'usd' // USDT is pegged to USD, so we use USD rate
-  };
 
   constructor(config: ProviderConfig) {
     super(config);
@@ -27,43 +19,44 @@ export class CoinGeckoProvider extends BaseProvider {
   }
 
   async getExchangeRate(from: string, to: string): Promise<ExchangeRateData> {
+    // Validate currencies are supported
+    if (!isSupportedCurrency(from) || !isSupportedCurrency(to)) {
+      throw new Error(`Unsupported currency pair: ${from}/${to}`);
+    }
+
     // For USDT to TON, we need to get TON price and invert it
     if (from === 'USDT' && to === 'TON') {
-      const tonCoinId = this.coinMapping['TON'];
-      const vsCurrency = this.currencyMapping['USD']; // USDT is pegged to USD
-      
-      if (!tonCoinId || !vsCurrency) {
+      const tonMapping = getCoinGeckoMapping('TON');
+      if (!tonMapping) {
         throw new Error(`Unsupported currency pair: ${from}/${to}`);
       }
       
-      return this.fetchAndConvertRate(tonCoinId, vsCurrency, from, to, true);
+      return this.fetchAndConvertRate(tonMapping.coinId, tonMapping.vsCurrency, from, to, true);
     }
     
     // For TON to USDT, get TON price directly
     if (from === 'TON' && to === 'USDT') {
-      const coinId = this.coinMapping[from];
-      const vsCurrency = this.currencyMapping['USD']; // USDT is pegged to USD
-      
-      if (!coinId || !vsCurrency) {
+      const tonMapping = getCoinGeckoMapping('TON');
+      if (!tonMapping) {
         throw new Error(`Unsupported currency pair: ${from}/${to}`);
       }
       
-      return this.fetchAndConvertRate(coinId, vsCurrency, from, to, false);
+      return this.fetchAndConvertRate(tonMapping.coinId, tonMapping.vsCurrency, from, to, false);
     }
 
     // For other pairs, use the original logic
-    const coinId = this.coinMapping[from];
-    const vsCurrency = this.currencyMapping[to];
+    const fromMapping = getCoinGeckoMapping(from);
+    const toMapping = getCoinGeckoMapping(to);
 
-    if (!coinId) {
+    if (!fromMapping) {
       throw new Error(`Unsupported currency: ${from}`);
     }
 
-    if (!vsCurrency) {
+    if (!toMapping) {
       throw new Error(`Unsupported target currency: ${to}`);
     }
 
-    return this.fetchAndConvertRate(coinId, vsCurrency, from, to, false);
+    return this.fetchAndConvertRate(fromMapping.coinId, toMapping.vsCurrency, from, to, false);
   }
 
   private async fetchAndConvertRate(

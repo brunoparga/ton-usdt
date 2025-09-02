@@ -3,6 +3,7 @@ import { validateCurrency, sanitizeCurrency } from '../validation';
 import { CoinGeckoProvider, BaseProvider } from '../providers';
 import { ExchangeRateCache } from '../cache';
 import { config } from '../config';
+import { SUPPORTED_CURRENCY_CODES, isSupportedPair } from '../config/currency';
 import logger from '../logger';
 
 export class ExchangeRateService {
@@ -45,9 +46,8 @@ export class ExchangeRateService {
     }
 
     // Check supported currency pairs
-    const supportedCurrencies = ['TON', 'USDT'];
-    if (!supportedCurrencies.includes(fromCurrency) || !supportedCurrencies.includes(toCurrency)) {
-      throw new Error(`Unsupported currency pair: ${fromCurrency}-${toCurrency}. Supported currencies: ${supportedCurrencies.join(', ')}`);
+    if (!isSupportedPair(fromCurrency, toCurrency)) {
+      throw new Error(`Unsupported currency pair: ${fromCurrency}-${toCurrency}. Supported currencies: ${SUPPORTED_CURRENCY_CODES.join(', ')}`);
     }
 
     // Check cache first

@@ -1,5 +1,13 @@
 import { useState } from 'react'
 import './App.css'
+import { 
+  SUPPORTED_CURRENCIES, 
+  EXCHANGE_SOURCES, 
+  Currency, 
+  TimeSelection,
+  getDefaultToCurrency,
+  getDefaultFromCurrency
+} from './config/currency'
 
 // Types
 interface ExchangeRateResponse {
@@ -9,9 +17,6 @@ interface ExchangeRateResponse {
   source: string;
   timestamp: string;
 }
-
-type Currency = 'TON' | 'USDT' | 'more';
-type TimeSelection = 'now' | 'specific';
 
 function App() {
   const [fromCurrency, setFromCurrency] = useState<Currency>('TON')
@@ -62,14 +67,15 @@ function App() {
             onChange={(e) => {
               const value = e.target.value as Currency
               setFromCurrency(value)
-              if (value === 'TON') setToCurrency('USDT')
-              if (value === 'USDT') setToCurrency('TON')
+              setToCurrency(getDefaultToCurrency(value))
             }}
             className="currency-select"
           >
-            <option value="TON">TON</option>
-            <option value="USDT">USDT</option>
-            <option value="more" disabled>More currency pairs in the future</option>
+            {SUPPORTED_CURRENCIES.map(currency => (
+              <option key={currency.value} value={currency.value} disabled={currency.disabled}>
+                {currency.label}
+              </option>
+            ))}
           </select>
           
           <button onClick={handleCurrencySwitch} className="switch-button">
@@ -81,14 +87,15 @@ function App() {
             onChange={(e) => {
               const value = e.target.value as Currency
               setToCurrency(value)
-              if (value === 'TON') setFromCurrency('USDT')
-              if (value === 'USDT') setFromCurrency('TON')
+              setFromCurrency(getDefaultFromCurrency(value))
             }}
             className="currency-select"
           >
-            <option value="TON">TON</option>
-            <option value="USDT">USDT</option>
-            <option value="more" disabled>More currency pairs in the future</option>
+            {SUPPORTED_CURRENCIES.map(currency => (
+              <option key={currency.value} value={currency.value} disabled={currency.disabled}>
+                {currency.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -100,8 +107,11 @@ function App() {
             onChange={(e) => setExchangeSource(e.target.value)}
             className="source-select"
           >
-            <option value="CoinGecko">CoinGecko</option>
-            <option value="more" disabled>More sources in the future</option>
+            {EXCHANGE_SOURCES.map(source => (
+              <option key={source.value} value={source.value} disabled={source.disabled}>
+                {source.label}
+              </option>
+            ))}
           </select>
         </div>
 
