@@ -65,14 +65,30 @@ describe('App', () => {
       });
     });
 
+    it('should return 400 for invalid currency format', async () => {
+      const response = await request(app)
+        .get('/api/exchange-rate?from=ton&to=usdt')
+        .expect(400);
+
+      expect(response.body.error).toContain('Invalid');
+    });
+
+    it('should return 400 for same currency', async () => {
+      const response = await request(app)
+        .get('/api/exchange-rate?from=TON&to=TON')
+        .expect(400);
+
+      expect(response.body).toEqual({
+        error: 'From and to currencies cannot be the same'
+      });
+    });
+
     it('should return 404 for unsupported currency pair', async () => {
       const response = await request(app)
         .get('/api/exchange-rate?from=BTC&to=ETH')
         .expect(404);
 
-      expect(response.body).toEqual({
-        error: 'Exchange rate not found for BTC-ETH'
-      });
+      expect(response.body.error).toContain('Exchange rate not found for BTC-ETH');
     });
 
     it('should return 400 when both parameters are missing', async () => {

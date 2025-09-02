@@ -19,6 +19,8 @@ function App() {
   const [exchangeSource, setExchangeSource] = useState<string>('CoinGecko')
   const [timeSelection, setTimeSelection] = useState<TimeSelection>('now')
   const [exchangeRate, setExchangeRate] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleCurrencySwitch = () => {
     const temp = fromCurrency
@@ -27,19 +29,26 @@ function App() {
   }
 
   const handleGo = async (): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+    setExchangeRate(null)
+    
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
       const response = await fetch(`${backendUrl}/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}`)
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `Server error: ${response.status}`)
       }
       
       const data: ExchangeRateResponse = await response.json()
       setExchangeRate(data.rate)
     } catch (error) {
       console.error('Error fetching exchange rate:', error)
-      setExchangeRate(null)
+      setError(error instanceof Error ? error.message : 'Failed to fetch exchange rate')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -125,9 +134,20 @@ function App() {
           )}
         </div>
 
-        <button onClick={handleGo} className="go-button">
-          GO
+        <button 
+          onClick={handleGo} 
+          className="go-button"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Loading...' : 'GO'}
         </button>
+
+        {error && (
+          <div className="error-display">
+            <h3>Error</h3>
+            <p className="error-message">{error}</p>
+          </div>
+        )}
 
         {exchangeRate && (
           <div className="exchange-rate-display">

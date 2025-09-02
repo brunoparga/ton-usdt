@@ -85,8 +85,25 @@ describe('App', () => {
       expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/api/exchange-rate?from=TON&to=USDT')
     })
 
+    await waitFor(() => {
+      expect(screen.getByText('Error')).toBeInTheDocument()
+      expect(screen.getByText('Network error')).toBeInTheDocument()
+    })
+
     // Should not display exchange rate on error
     expect(screen.queryByText('Exchange Rate')).not.toBeInTheDocument()
+  })
+
+  it('shows loading state when fetching', async () => {
+    mockFetch.mockImplementationOnce(() => new Promise(() => {})) // Never resolves
+
+    render(<App />)
+    const goButton = screen.getByText('GO')
+    
+    fireEvent.click(goButton)
+    
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(goButton).toBeDisabled()
   })
 
   it('displays time selection options', () => {
