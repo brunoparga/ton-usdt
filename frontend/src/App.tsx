@@ -35,7 +35,7 @@ function App() {
     
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
-      const response = await fetch(`${backendUrl}/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}`)
+      const response = await fetch(`${backendUrl}/api/exchange-rate?from=${fromCurrency}&to=${toCurrency}&provider=${exchangeSource.toLowerCase()}`)
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))

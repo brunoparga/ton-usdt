@@ -9,5 +9,11 @@ export const config = {
   },
   logging: {
     level: process.env.LOG_LEVEL || 'info'
+  },
+  api: {
+    coingecko: {
+      baseUrl: 'https://api.coingecko.com/api/v3',
+      timeout: 5000 // 5 seconds
+    }
   }
 };

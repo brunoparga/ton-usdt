@@ -1,9 +1,25 @@
 import { ExchangeRateResponse } from '../types';
-import { EXCHANGE_RATES } from '../constants';
 import { validateCurrency, sanitizeCurrency } from '../validation';
+import { CoinGeckoProvider, BaseProvider } from '../providers';
+import { config } from '../config';
 
 export class ExchangeRateService {
-  static getExchangeRate(from: string, to: string): ExchangeRateResponse {
+  private static providers: Map<string, BaseProvider> = new Map();
+
+  private static getProvider(providerName: string): BaseProvider {
+    if (!this.providers.has(providerName)) {
+      switch (providerName.toLowerCase()) {
+        case 'coingecko':
+          this.providers.set(providerName, new CoinGeckoProvider(config.api.coingecko));
+          break;
+        default:
+          throw new Error(`Unsupported provider: ${providerName}`);
+      }
+    }
+    return this.providers.get(providerName)!;
+  }
+
+  static async getExchangeRate(from: string, to: string, provider: string = 'coingecko'): Promise<ExchangeRateResponse> {
     // Validate and sanitize input
     const fromError = validateCurrency(from);
     const toError = validateCurrency(to);
@@ -25,19 +41,17 @@ export class ExchangeRateService {
       throw new Error('From and to currencies cannot be the same');
     }
 
-    const pair = `${fromCurrency}-${toCurrency}`;
-    const rate = EXCHANGE_RATES[pair];
-
-    if (!rate) {
-      throw new Error(`Exchange rate not found for ${pair}. Supported pairs: TON-USDT, USDT-TON`);
+    // Check supported currency pairs
+    const supportedCurrencies = ['TON', 'USDT'];
+    if (!supportedCurrencies.includes(fromCurrency) || !supportedCurrencies.includes(toCurrency)) {
+      throw new Error(`Unsupported currency pair: ${fromCurrency}-${toCurrency}. Supported currencies: ${supportedCurrencies.join(', ')}`);
     }
 
-    return {
-      from: fromCurrency,
-      to: toCurrency,
-      rate: parseFloat(rate.toFixed(6)),
-      source: 'CoinGecko',
-      timestamp: new Date().toISOString()
-    };
+    try {
+      const providerInstance = this.getProvider(provider);
+      return await providerInstance.getExchangeRate(fromCurrency, toCurrency);
+    } catch (error) {
+      throw new Error(`Failed to fetch exchange rate: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 }

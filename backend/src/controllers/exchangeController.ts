@@ -5,7 +5,7 @@ import { ApiError, HealthResponse } from '../types';
 
 export class ExchangeController {
   static async getExchangeRate(req: Request, res: Response): Promise<void> {
-    const { from, to } = req.query;
+    const { from, to, provider } = req.query;
     
     // Validate required parameters
     if (!from || !to) {
@@ -16,12 +16,20 @@ export class ExchangeController {
       return;
     }
 
+    // Use provider from query param, default to 'coingecko'
+    const providerName = (provider as string) || 'coingecko';
+
     try {
-      const response = ExchangeRateService.getExchangeRate(from as string, to as string);
+      const response = await ExchangeRateService.getExchangeRate(
+        from as string, 
+        to as string, 
+        providerName
+      );
       
       logger.info('Exchange rate requested', { 
         pair: `${response.from}-${response.to}`, 
         rate: response.rate, 
+        provider: providerName,
         ip: req.ip 
       });
       
@@ -32,6 +40,7 @@ export class ExchangeController {
         error: errorMessage, 
         from, 
         to, 
+        provider: providerName,
         ip: req.ip 
       });
       
