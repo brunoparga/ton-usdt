@@ -64,7 +64,7 @@ describe('App', () => {
     fireEvent.click(goButton)
     
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/api/exchange-rate?from=TON&to=USDT')
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/api/exchange-rate?from=TON&to=USDT&provider=coingecko')
     })
 
     await waitFor(() => {
@@ -82,7 +82,7 @@ describe('App', () => {
     fireEvent.click(goButton)
     
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/api/exchange-rate?from=TON&to=USDT')
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:3001/api/exchange-rate?from=TON&to=USDT&provider=coingecko')
     })
 
     await waitFor(() => {
