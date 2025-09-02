@@ -6,6 +6,7 @@ export function createRoutes(): Router {
 
   router.get('/api/exchange-rate', ExchangeController.getExchangeRate);
   router.get('/api/health', ExchangeController.getHealth);
+  router.get('/api/cache/stats', ExchangeController.getCacheStats);
 
   return router;
 }

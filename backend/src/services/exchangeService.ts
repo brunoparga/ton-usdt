@@ -1,10 +1,13 @@
 import { ExchangeRateResponse } from '../types';
 import { validateCurrency, sanitizeCurrency } from '../validation';
 import { CoinGeckoProvider, BaseProvider } from '../providers';
+import { ExchangeRateCache } from '../cache';
 import { config } from '../config';
+import logger from '../logger';
 
 export class ExchangeRateService {
   private static providers: Map<string, BaseProvider> = new Map();
+  private static cache: ExchangeRateCache = new ExchangeRateCache();
 
   private static getProvider(providerName: string): BaseProvider {
     if (!this.providers.has(providerName)) {
@@ -47,11 +50,46 @@ export class ExchangeRateService {
       throw new Error(`Unsupported currency pair: ${fromCurrency}-${toCurrency}. Supported currencies: ${supportedCurrencies.join(', ')}`);
     }
 
+    // Check cache first
+    const cacheKey = `${provider}-${fromCurrency}-${toCurrency}`;
+    const cachedData = this.cache.get(provider, fromCurrency, toCurrency);
+    
+    if (cachedData) {
+      logger.info('Cache hit', { 
+        key: cacheKey, 
+        provider, 
+        pair: `${fromCurrency}-${toCurrency}` 
+      });
+      return cachedData;
+    }
+
+    logger.info('Cache miss', { 
+      key: cacheKey, 
+      provider, 
+      pair: `${fromCurrency}-${toCurrency}` 
+    });
+
     try {
       const providerInstance = this.getProvider(provider);
-      return await providerInstance.getExchangeRate(fromCurrency, toCurrency);
+      const exchangeRate = await providerInstance.getExchangeRate(fromCurrency, toCurrency);
+      
+      // Store in cache
+      this.cache.set(provider, fromCurrency, toCurrency, exchangeRate);
+      
+      logger.info('Data cached', { 
+        key: cacheKey, 
+        provider, 
+        pair: `${fromCurrency}-${toCurrency}`,
+        rate: exchangeRate.rate
+      });
+      
+      return exchangeRate;
     } catch (error) {
       throw new Error(`Failed to fetch exchange rate: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  static getCacheStats() {
+    return this.cache.getStats();
   }
 }

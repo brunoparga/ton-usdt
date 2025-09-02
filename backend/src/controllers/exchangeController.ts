@@ -57,4 +57,17 @@ export class ExchangeController {
     
     res.json(response);
   }
+
+  static getCacheStats(req: Request, res: Response): void {
+    try {
+      const stats = ExchangeRateService.getCacheStats();
+      res.json({
+        cache: stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      logger.error('Failed to get cache stats', { error });
+      res.status(500).json({ error: 'Failed to get cache statistics' } as ApiError);
+    }
+  }
 }
