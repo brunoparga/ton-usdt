@@ -62,19 +62,28 @@ ton-usdt/
 
 ## Features
 
-- **PING/PONG Toggle**: Simple interactive button demonstration
+- **Currency Exchange Interface**: TON/USDT pair selection with smart switching
+- **Exchange Rate Display**: Real-time rate calculation (123.45 TON/USDT)
+- **Source Selection**: CoinGecko integration with extensible architecture
+- **Time Selection**: Current rates with future historical data support
 - **Modern React**: Built with React 18 and modern hooks
 - **Fast Development**: Vite for instant hot module replacement
-- **Clean UI**: Minimal, focused interface
+- **Clean UI**: Compact, professional interface
 
-## Development Notes
+## Current Status
 
-This project follows a 2-hour development approach:
-- Express backend (planned)
-- Vite + React frontend
+✅ **Frontend Complete**: React app with currency exchange interface
+- TON/USDT pair selection with smart switching
+- CoinGecko source integration
+- Exchange rate display (123.45 TON/USDT)
+- Compact, professional UI
+
+🔄 **Next Steps**:
+- Express backend API
+- Real CoinGecko API integration
 - In-memory caching
 - Local Docker deployment
-- SQLite database
+- SQLite database for historical data
 
 ## License
 
