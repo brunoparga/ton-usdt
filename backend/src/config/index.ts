@@ -15,5 +15,14 @@ export const config = {
       baseUrl: 'https://api.coingecko.com/api/v3',
       timeout: 5000 // 5 seconds
     }
+  },
+  database: {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'ton_usdt',
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'password',
+    ssl: process.env.DB_SSL === 'true',
+    connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '5000')
   }
 };

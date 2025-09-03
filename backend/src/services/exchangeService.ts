@@ -4,11 +4,13 @@ import { CoinGeckoProvider, BaseProvider } from '../providers';
 import { ExchangeRateCache } from '../cache';
 import { config } from '../config';
 import { SUPPORTED_CURRENCY_CODES, isSupportedPair } from '../config/currency';
+import { DatabaseService } from '../database';
 import logger from '../logger';
 
 export class ExchangeRateService {
   private static providers: Map<string, BaseProvider> = new Map();
   private static cache: ExchangeRateCache = new ExchangeRateCache();
+  private static databaseService: DatabaseService | null = null;
 
   private static getProvider(providerName: string): BaseProvider {
     if (!this.providers.has(providerName)) {
@@ -21,6 +23,10 @@ export class ExchangeRateService {
       }
     }
     return this.providers.get(providerName)!;
+  }
+
+  static setDatabaseService(databaseService: DatabaseService): void {
+    this.databaseService = databaseService;
   }
 
   static async getExchangeRate(from: string, to: string, provider: string = 'coingecko'): Promise<ExchangeRateResponse> {
@@ -75,6 +81,21 @@ export class ExchangeRateService {
       
       // Store in cache
       this.cache.set(provider, fromCurrency, toCurrency, exchangeRate);
+      
+      // Store in database if available
+      if (this.databaseService) {
+        try {
+          await this.databaseService.saveExchangeRate({
+            from_currency: fromCurrency,
+            to_currency: toCurrency,
+            rate: exchangeRate.rate,
+            source: exchangeRate.source,
+            timestamp: new Date(exchangeRate.timestamp)
+          });
+        } catch (dbError) {
+          logger.warn('Failed to save to database, continuing with cache only:', dbError);
+        }
+      }
       
       logger.info('Data cached', { 
         key: cacheKey, 
