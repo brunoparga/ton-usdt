@@ -16,12 +16,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.15.0",
     "@types/pg": "^8.15.5",
     "axios": "^1.6.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-rate-limit": "^7.1.5",
     "pg": "^8.16.3",
+    "prisma": "^6.15.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

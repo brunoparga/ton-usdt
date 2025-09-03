@@ -148,3 +148,5 @@ build/
 # Temporary files
 tmp/
 temp/
+
+/generated/prisma

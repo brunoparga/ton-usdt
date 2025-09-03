@@ -3,6 +3,4 @@
  */
 
 export * from './interfaces';
-export * from './postgresConnection';
-export * from './postgresService';
-export * from './migrations';
+export * from './prismaService';
