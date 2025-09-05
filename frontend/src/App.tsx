@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import { Currency, TimeSelection } from './config/currency'
+import { Currency } from './config/currency'
 import { ExchangeApiService } from './services/exchangeApi'
 import { CurrencySelector } from './components/CurrencySelector'
 import { ExchangeForm } from './components/ExchangeForm'
@@ -10,8 +10,9 @@ function App() {
   const [fromCurrency, setFromCurrency] = useState<Currency>('TON')
   const [toCurrency, setToCurrency] = useState<Currency>('USDT')
   const [exchangeSource, setExchangeSource] = useState<string>('CoinGecko')
-  const [timeSelection, setTimeSelection] = useState<TimeSelection>('now')
   const [exchangeRate, setExchangeRate] = useState<number | null>(null)
+  const [rateFromCurrency, setRateFromCurrency] = useState<Currency | null>(null)
+  const [rateToCurrency, setRateToCurrency] = useState<Currency | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,6 +32,8 @@ function App() {
     try {
       const data = await apiService.getExchangeRate(fromCurrency, toCurrency, exchangeSource)
       setExchangeRate(data.rate)
+      setRateFromCurrency(fromCurrency)
+      setRateToCurrency(toCurrency)
     } catch (error) {
       console.error('Error fetching exchange rate:', error)
       setError(error instanceof Error ? error.message : 'Failed to fetch exchange rate')
@@ -53,16 +56,14 @@ function App() {
 
         <ExchangeForm
           exchangeSource={exchangeSource}
-          timeSelection={timeSelection}
           isLoading={isLoading}
           onExchangeSourceChange={setExchangeSource}
-          onTimeSelectionChange={setTimeSelection}
           onSubmit={handleSubmit}
         />
 
         <ExchangeResult
-          fromCurrency={fromCurrency}
-          toCurrency={toCurrency}
+          fromCurrency={rateFromCurrency || fromCurrency}
+          toCurrency={rateToCurrency || toCurrency}
           exchangeRate={exchangeRate}
           error={error}
         />

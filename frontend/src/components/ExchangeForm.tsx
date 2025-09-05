@@ -1,20 +1,16 @@
-import { Currency, TimeSelection, EXCHANGE_SOURCES } from '../config/currency';
+import { Currency, EXCHANGE_SOURCES } from '../config/currency';
 
 interface ExchangeFormProps {
   exchangeSource: string;
-  timeSelection: TimeSelection;
   isLoading: boolean;
   onExchangeSourceChange: (source: string) => void;
-  onTimeSelectionChange: (selection: TimeSelection) => void;
   onSubmit: () => void;
 }
 
 export function ExchangeForm({
   exchangeSource,
-  timeSelection,
   isLoading,
   onExchangeSourceChange,
-  onTimeSelectionChange,
   onSubmit
 }: ExchangeFormProps) {
   return (
@@ -35,34 +31,6 @@ export function ExchangeForm({
         </select>
       </div>
 
-      <div className="time-selection">
-        <div className="radio-group">
-          <label>
-            <input 
-              type="radio" 
-              name="time" 
-              value="now" 
-              checked={timeSelection === 'now'}
-              onChange={(e) => onTimeSelectionChange(e.target.value as TimeSelection)}
-            />
-            Now
-          </label>
-          <label>
-            <input 
-              type="radio" 
-              name="time" 
-              value="specific" 
-              checked={timeSelection === 'specific'}
-              onChange={(e) => onTimeSelectionChange(e.target.value as TimeSelection)}
-            />
-            Specific Date & Time
-          </label>
-        </div>
-        
-        {timeSelection === 'specific' && (
-          <p className="future-feature">Date & time selection coming in the future</p>
-        )}
-      </div>
 
       <button 
         onClick={onSubmit} 

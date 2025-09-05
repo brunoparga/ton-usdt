@@ -20,7 +20,7 @@ export const EXCHANGE_SOURCES: CurrencyOption[] = [
 ];
 
 export type Currency = 'TON' | 'USDT' | 'more';
-export type TimeSelection = 'now' | 'specific';
+export type TimeSelection = 'now';
 
 export function getDefaultToCurrency(fromCurrency: Currency): Currency {
   switch (fromCurrency) {
