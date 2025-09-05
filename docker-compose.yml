@@ -29,6 +29,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/ton_usdt
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=ton_usdt
@@ -52,10 +53,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=http://localhost:3001
     ports:
       - "80:80"
-    environment:
-      - VITE_BACKEND_URL=http://backend:3001
     depends_on:
       backend:
         condition: service_healthy
