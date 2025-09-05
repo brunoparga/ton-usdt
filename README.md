@@ -6,10 +6,19 @@ A full-stack TypeScript application for tracking TON/USDT cryptocurrency exchang
 
 - **Frontend**: React 18 + Vite + TypeScript + Vitest
 - **Backend**: Express.js + TypeScript + Jest + Winston
+- **Database**: PostgreSQL with Prisma ORM
 - **Runtime**: Node.js 22 (LTS)
 - **Package Manager**: npm 10
 - **Containerization**: Docker + Docker Compose
 - **Testing**: Vitest (frontend) + Jest (backend)
+
+### Framework Choices
+
+**Backend - Express.js**: Chosen for its simplicity and minimal overhead. Express provides a lightweight, unopinionated framework that allows for clean architecture without unnecessary complexity. It's well-suited for REST APIs and integrates seamlessly with TypeScript and our caching requirements.
+
+**Frontend - React 18**: Selected for its component-based architecture, excellent TypeScript support, and robust ecosystem. React's hooks and functional components provide clean state management for our exchange rate display requirements.
+
+**Database - PostgreSQL**: Chosen for its reliability, ACID compliance, and excellent TypeScript integration through Prisma ORM. PostgreSQL provides robust data integrity for financial data storage.
 
 ## Getting Started
 
@@ -18,6 +27,31 @@ A full-stack TypeScript application for tracking TON/USDT cryptocurrency exchang
 - Node.js 22.x (LTS) or higher
 - npm 10.x or higher
 - Docker and Docker Compose (for containerized deployment)
+
+### Database Setup
+
+The application uses PostgreSQL as the primary database. Database configuration is handled automatically through Docker Compose, but you can also set up a local PostgreSQL instance if needed.
+
+**Docker Database (Recommended):**
+The `docker-compose.yml` file includes a PostgreSQL service that automatically:
+- Creates a database named `ton_usdt`
+- Sets up user `postgres` with password `password`
+- Exposes the database on port `5432`
+- Persists data in a Docker volume
+
+**Manual Database Setup (Optional):**
+If you prefer to run PostgreSQL locally:
+```bash
+# Install PostgreSQL (Ubuntu/Debian)
+sudo apt-get install postgresql postgresql-contrib
+
+# Create database and user
+sudo -u postgres psql
+CREATE DATABASE ton_usdt;
+CREATE USER postgres WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE ton_usdt TO postgres;
+\q
+```
 
 ### Option 1: Docker Deployment (Recommended)
 

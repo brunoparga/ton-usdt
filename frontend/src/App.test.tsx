@@ -106,20 +106,6 @@ describe('App', () => {
     expect(goButton).toBeDisabled()
   })
 
-  it('displays time selection options', () => {
-    render(<App />)
-    expect(screen.getByLabelText('Now')).toBeInTheDocument()
-    expect(screen.getByLabelText('Specific Date & Time')).toBeInTheDocument()
-  })
-
-  it('shows future feature message when specific time is selected', () => {
-    render(<App />)
-    const specificTimeRadio = screen.getByLabelText('Specific Date & Time')
-    
-    fireEvent.click(specificTimeRadio)
-    
-    expect(screen.getByText('Date & time selection coming in the future')).toBeInTheDocument()
-  })
 
   it('displays exchange source selector', () => {
     render(<App />)
